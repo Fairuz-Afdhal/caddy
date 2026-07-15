@@ -59,6 +59,11 @@ timelesshub.my.id {
 		reverse_proxy app:3000
 	}
 
+	@adminer expression `{labels.2} == "adminer"`
+	handle @adminer {
+		reverse_proxy adminer:8080
+	}
+
 	# Fallback: routes subdomain to a container of the same name on port 80
 	handle {
 		reverse_proxy {labels.2}:80
