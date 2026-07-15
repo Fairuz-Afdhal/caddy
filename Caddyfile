@@ -30,12 +30,13 @@ timelesshub.my.id {
 		dns cloudflare {$CLOUDFLARE_API_TOKEN}
 	}
 
+	import shared_404
+
 	@fairuz expression `{labels.2} == "fairuz"`
 	handle @fairuz {
 		encode zstd gzip
 		root * /srv/fairuz
 		file_server
-		import shared_404
 		import static_cache
 	}
 
