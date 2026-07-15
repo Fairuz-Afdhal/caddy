@@ -32,7 +32,7 @@ timelesshub.my.id {
 
 	import shared_404
 
-	@fairuz expression `{labels.2} == "fairuz"`
+	@fairuz expression `{labels.3} == "fairuz"`
 	handle @fairuz {
 		encode zstd gzip
 		root * /srv/fairuz
@@ -40,7 +40,7 @@ timelesshub.my.id {
 		import static_cache
 	}
 
-	@comet expression `{labels.2} == "comet"`
+	@comet expression `{labels.3} == "comet"`
 	handle @comet {
 		reverse_proxy comet:8000 {
 			transport http {
@@ -50,23 +50,23 @@ timelesshub.my.id {
 		}
 	}
 
-	@aio expression `{labels.2} == "aio"`
+	@aio expression `{labels.3} == "aio"`
 	handle @aio {
 		reverse_proxy aiostreams:3000
 	}
 
-	@duita expression `{labels.2} == "duita"`
+	@duita expression `{labels.3} == "duita"`
 	handle @duita {
 		reverse_proxy app:3000
 	}
 
-	@adminer expression `{labels.2} == "adminer"`
+	@adminer expression `{labels.3} == "adminer"`
 	handle @adminer {
 		reverse_proxy adminer:8080
 	}
 
 	# Fallback: routes subdomain to a container of the same name on port 80
 	handle {
-		reverse_proxy {labels.2}:80
+		reverse_proxy {labels.3}:80
 	}
 }
