@@ -1,0 +1,66 @@
+(shared_404) {
+	handle_errors {
+		@404 expression `{err.status_code} == 404`
+		handle @404 {
+			root * /srv/shared
+			rewrite * /404.html
+			file_server
+		}
+	}
+}
+
+(static_cache) {
+	@static {
+		path *.css *.js *.svg *.png *.jpg *.jpeg *.webp *.woff2
+	}
+	header @static Cache-Control "public, max-age=2592000, immutable"
+	header *.html Cache-Control "public, max-age=300"
+}
+
+timelesshub.my.id {
+	encode zstd gzip
+	root * /srv/timelesshub
+	file_server
+	import shared_404
+	import static_cache
+}
+
+*.timelesshub.my.id {
+	tls {
+		dns cloudflare {$CLOUDFLARE_API_TOKEN}
+	}
+
+	@fairuz expression `{labels.2} == "fairuz"`
+	handle @fairuz {
+		encode zstd gzip
+		root * /srv/fairuz
+		file_server
+		import shared_404
+		import static_cache
+	}
+
+	@comet expression `{labels.2} == "comet"`
+	handle @comet {
+		reverse_proxy comet:8000 {
+			transport http {
+				response_header_timeout 60s
+				read_timeout 60s
+			}
+		}
+	}
+
+	@aio expression `{labels.2} == "aio"`
+	handle @aio {
+		reverse_proxy aiostreams:3000
+	}
+
+	@duita expression `{labels.2} == "duita"`
+	handle @duita {
+		reverse_proxy app:3000
+	}
+
+	# Fallback: routes subdomain to a container of the same name on port 80
+	handle {
+		reverse_proxy {labels.2}:80
+	}
+}

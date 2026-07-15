@@ -1,0 +1,32 @@
+services:
+  caddy:
+    build: .
+    container_name: caddy
+    restart: unless-stopped
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ../timelesshub/site:/srv/timelesshub:ro
+      - ../timelesshub/portfolio:/srv/fairuz:ro
+      - ../timelesshub/shared:/srv/shared:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - caddy_proxy
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  caddy_proxy:
+    name: caddy_proxy
+    driver: bridge
